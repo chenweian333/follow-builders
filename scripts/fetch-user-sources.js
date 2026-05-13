@@ -192,7 +192,11 @@ async function fetchRss(source, state, cutoff) {
 // ── Main ──────────────────────────────────────────────────────────────────────
 
 async function main() {
-  if (!existsSync(SOURCES_PATH)) {
+  // 優先讀取環境變數 USER_SOURCES_JSON
+  let sources;
+  if (process.env.USER_SOURCES_JSON) {
+    sources = JSON.parse(process.env.USER_SOURCES_JSON);
+  } else if (!existsSync(SOURCES_PATH)) {
     console.log(JSON.stringify({
       generatedAt: new Date().toISOString(),
       youtube: [], rss: [],
@@ -202,7 +206,9 @@ async function main() {
     return;
   }
 
-  const sources = JSON.parse(await readFile(SOURCES_PATH, 'utf-8'));
+  } else {
+    sources = JSON.parse(await readFile(SOURCES_PATH, 'utf-8'));
+  }
   const state   = await loadState();
   const cutoff  = new Date(Date.now() - LOOKBACK_HOURS * 3600 * 1000);
 
