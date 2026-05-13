@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "description": "AI Builders Digest — daily digest bot and Telegram server",
   "type": "module",
+  "main": "scripts/server.js",
   "scripts": {
     "start": "node scripts/server.js"
   },
