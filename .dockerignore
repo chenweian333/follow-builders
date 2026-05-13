@@ -1,5 +1,6 @@
 .git
 .claude
+node_modules
 scripts/node_modules
 *.log
 state-feed.json

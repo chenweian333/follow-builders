@@ -3,8 +3,8 @@ FROM node:22-slim
 WORKDIR /app
 
 # Install deps in a separate layer for better caching
-COPY scripts/package*.json scripts/
-RUN cd scripts && npm ci --production
+COPY package*.json ./
+RUN npm ci --omit=dev
 
 # Copy all source files
 COPY . .
