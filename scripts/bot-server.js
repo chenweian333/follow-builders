@@ -16,7 +16,7 @@
 //   - Responds in Traditional Chinese; keeps English quotes/names in English
 // ============================================================================
 
-import { readFile, writeFile, appendFile } from 'fs/promises';
+import { readFile, writeFile } from 'fs/promises';
 import { existsSync } from 'fs';
 import { join } from 'path';
 import { homedir } from 'os';
@@ -24,8 +24,7 @@ import { config as loadEnv } from 'dotenv';
 import { DatabaseSync } from 'node:sqlite';
 import { YoutubeTranscript } from 'youtube-transcript';
 
-const USER_DIR  = join(homedir(), '.follow-builders');
-const LOG_FILE  = join(USER_DIR, 'bot.log');
+const USER_DIR  = process.env.DATA_DIR || join(homedir(), '.follow-builders');
 const OFFSET_FILE = join(USER_DIR, 'bot-offset.json');
 const DB_PATH   = join(USER_DIR, 'content.db');
 
@@ -40,13 +39,7 @@ const MAX_HISTORY = 20; // messages per chat session
 // ── Logging ───────────────────────────────────────────────────────────────────
 
 function log(msg) {
-  const line = `[${new Date().toISOString()}] ${msg}`;
-  // console.log is redirected to bot.log by nohup; appendFile would double-write
-  if (process.stdout.isTTY) {
-    console.log(line);
-  } else {
-    appendFile(LOG_FILE, line + '\n').catch(() => {});
-  }
+  console.log(`[${new Date().toISOString()}] ${msg}`);
 }
 
 // ── Conversation sessions (in-memory) ─────────────────────────────────────────

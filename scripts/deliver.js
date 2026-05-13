@@ -28,7 +28,7 @@ import { config as loadEnv } from 'dotenv';
 
 // -- Constants ---------------------------------------------------------------
 
-const USER_DIR = join(homedir(), '.follow-builders');
+const USER_DIR = process.env.DATA_DIR || join(homedir(), '.follow-builders');
 const CONFIG_PATH = join(USER_DIR, 'config.json');
 const ENV_PATH = join(USER_DIR, '.env');
 
@@ -176,7 +176,11 @@ async function main() {
     config = JSON.parse(await readFile(CONFIG_PATH, 'utf-8'));
   }
 
-  const delivery = config.delivery || { method: 'stdout' };
+  const delivery = {
+    method:  config.delivery?.method  || process.env.DELIVERY_METHOD  || 'stdout',
+    chatId:  config.delivery?.chatId  || process.env.TELEGRAM_CHAT_ID,
+    email:   config.delivery?.email   || process.env.DELIVERY_EMAIL,
+  };
 
   // --error "reason" mode: send a Telegram failure notification
   const args = process.argv.slice(2);

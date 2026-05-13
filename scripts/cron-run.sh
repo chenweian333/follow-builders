@@ -5,7 +5,7 @@
 set -euo pipefail
 
 SCRIPTS_DIR="$(cd "$(dirname "$0")" && pwd)"
-NODE="/opt/homebrew/bin/node"
+NODE="${NODE_BINARY:-$(command -v node 2>/dev/null || echo /opt/homebrew/bin/node)}"
 LOG="/tmp/fb-cron.log"
 RAW="/tmp/fb-raw.json"
 DIGEST="/tmp/fb-digest.txt"

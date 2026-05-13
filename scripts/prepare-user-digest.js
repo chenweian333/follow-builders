@@ -22,7 +22,7 @@ import { promisify } from 'util';
 
 const exec = promisify(execFile);
 
-const USER_DIR   = join(homedir(), '.follow-builders');
+const USER_DIR   = process.env.DATA_DIR || join(homedir(), '.follow-builders');
 const SCRIPT_DIR = decodeURIComponent(new URL('.', import.meta.url).pathname);
 
 // Load a prompt file: user custom > local skills copy

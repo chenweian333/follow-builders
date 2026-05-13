@@ -16,7 +16,7 @@ import { existsSync } from 'fs';
 import { join } from 'path';
 import { homedir } from 'os';
 
-const USER_DIR    = join(homedir(), '.follow-builders');
+const USER_DIR    = process.env.DATA_DIR || join(homedir(), '.follow-builders');
 const SOURCES_PATH = join(USER_DIR, 'user-sources.json');
 const STATE_PATH   = join(USER_DIR, 'state-user.json');
 

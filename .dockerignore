@@ -1,0 +1,5 @@
+.git
+.claude
+scripts/node_modules
+*.log
+state-feed.json

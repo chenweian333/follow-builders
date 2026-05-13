@@ -4,11 +4,13 @@
   "description": "Scripts for Follow Builders skill — feed generation, digest preparation, delivery",
   "type": "module",
   "scripts": {
+    "start": "node server.js",
     "generate-feed": "node generate-feed.js",
     "prepare-digest": "node prepare-digest.js"
   },
   "dependencies": {
     "dotenv": "^16.4.0",
+    "node-cron": "^3.0.3",
     "proper-lockfile": "^4.1.0",
     "youtube-transcript": "^1.3.1"
   }
