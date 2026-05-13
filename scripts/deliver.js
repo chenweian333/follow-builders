@@ -90,7 +90,7 @@ async function sendTelegram(text, botToken, chatId) {
         body: JSON.stringify({
           chat_id: chatId,
           text: chunk,
-          parse_mode: 'Markdown',
+          parse_mode: 'HTML',
           disable_web_page_preview: true
         })
       }
@@ -98,7 +98,7 @@ async function sendTelegram(text, botToken, chatId) {
 
     if (!res.ok) {
       const err = await res.json();
-      // If Markdown parsing fails, retry without parse_mode
+      // If HTML parsing fails, retry without parse_mode
       if (err.description && err.description.includes("can't parse")) {
         await fetch(
           `https://api.telegram.org/bot${botToken}/sendMessage`,
@@ -149,6 +149,22 @@ async function sendEmail(text, apiKey, toEmail) {
   }
 }
 
+// -- Error Notification ------------------------------------------------------
+
+// Sends a short Telegram message when the pipeline fails.
+// Called with --error "reason" from cron-run.sh.
+async function sendErrorNotification(reason, botToken, chatId) {
+  const date = new Date().toLocaleDateString('zh-TW', {
+    timeZone: 'Asia/Shanghai', year: 'numeric', month: 'long', day: 'numeric',
+  });
+  const text = `⚠️ <b>Digest Failed</b> — ${date}\n\n${reason}`;
+  try {
+    await sendTelegram(text, botToken, chatId);
+  } catch (err) {
+    process.stderr.write(`deliver.js: failed to send error notification: ${err.message}\n`);
+  }
+}
+
 // -- Main --------------------------------------------------------------------
 
 async function main() {
@@ -161,6 +177,27 @@ async function main() {
   }
 
   const delivery = config.delivery || { method: 'stdout' };
+
+  // --error "reason" mode: send a Telegram failure notification
+  const args = process.argv.slice(2);
+  const errorIdx = args.indexOf('--error');
+  if (errorIdx !== -1) {
+    const reason = args[errorIdx + 1] || 'Unknown error';
+    if (delivery.method === 'telegram') {
+      const botToken = process.env.TELEGRAM_BOT_TOKEN;
+      const chatId = delivery.chatId;
+      if (botToken && chatId) {
+        await sendErrorNotification(reason, botToken, chatId);
+        console.log(JSON.stringify({ status: 'ok', method: 'telegram', message: 'Error notification sent' }));
+      } else {
+        process.stderr.write(`deliver.js --error: missing TELEGRAM_BOT_TOKEN or chatId\n`);
+      }
+    } else {
+      process.stderr.write(`Digest failed: ${reason}\n`);
+    }
+    return;
+  }
+
   const digestText = await getDigestText();
 
   if (!digestText || digestText.trim().length === 0) {
@@ -205,11 +242,11 @@ async function main() {
         break;
     }
   } catch (err) {
-    console.log(JSON.stringify({
+    process.stderr.write(JSON.stringify({
       status: 'error',
       method: delivery.method,
       message: err.message
-    }));
+    }) + '\n');
     process.exit(1);
   }
 }

@@ -9,6 +9,7 @@
   },
   "dependencies": {
     "dotenv": "^16.4.0",
-    "proper-lockfile": "^4.1.0"
+    "proper-lockfile": "^4.1.0",
+    "youtube-transcript": "^1.3.1"
   }
 }
