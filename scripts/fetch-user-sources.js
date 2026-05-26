@@ -192,7 +192,6 @@ async function fetchRss(source, state, cutoff) {
 // ── Main ──────────────────────────────────────────────────────────────────────
 
 async function main() {
-  // 優先讀取環境變數 USER_SOURCES_JSON
   let sources;
   if (process.env.USER_SOURCES_JSON) {
     sources = JSON.parse(process.env.USER_SOURCES_JSON);
@@ -204,8 +203,6 @@ async function main() {
       errors: ['No user-sources.json found at ' + SOURCES_PATH],
     }));
     return;
-  }
-
   } else {
     sources = JSON.parse(await readFile(SOURCES_PATH, 'utf-8'));
   }
